@@ -1,6 +1,7 @@
 import csv
 import random
 from random import sample
+import numpy as np
 
 """ Directorios """
 carpeta_DatosProcesados = 'DatosProcesados/'
@@ -43,7 +44,7 @@ def save_max_min(categorias, datos_sinCategoria):
     lista_maximos= []
     lista_minimos= []
     #Para cada columna calculamos su minimo y maximo y lo guardamos y nuestra lista
-    for columna in range(len(categorias)):
+    for columna in range(len(categorias)-1):
         lista_maximos.append(valor_maximo(datos_sinCategoria,columna))
         lista_minimos.append(valor_minimo(datos_sinCategoria,columna))
     #Generamos un fichero donde escribimos estos datos
@@ -59,22 +60,22 @@ def save_max_min(categorias, datos_sinCategoria):
     return lista_maximos, lista_minimos
 
 """ Funcion para generar los ficheros de salida de datos """
-def generar_fichero(nombre, data, categorias):
+def generar_fichero(nombre, modelo, data, categorias):
     # Abrimos el fichero donde vamos a escribir
-    with open(carpeta_DatosProcesados + DatosEntrada + nombre + extension_salida, mode='w', newline='') as fichero_salida:
+    with open(carpeta_DatosProcesados + modelo + DatosEntrada + nombre + extension_salida, mode='w', newline='') as fichero_salida:
         writer = csv.writer(fichero_salida, delimiter=',', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
         #Escribimos las categorias
         writer.writerow(categorias)
         
         #Escribimos en sus ficheros respectivos los datos
-        for x in enumerate(data):
+        for x in range(len(data)):
             writer.writerow(data[x])
     return fichero_salida
 
 
 """ Función para aleatorizar las filas """
 def aleatorizacion(datos_sinCategoria):
-    datos_aleatorios = sample(datos_sinCategoria,len(datos_sinCategoria))
+    datos_aleatorios = sample(datos_sinCategoria, len(datos_sinCategoria))
     return datos_aleatorios
 
 """ Función que lee los datos del fichero de entrada """
@@ -89,66 +90,91 @@ def lectura_DatosEntrada():
             datosEntrada.append(fila)
     return datosEntrada
 
+
+""" Función para leer un fichero csv y devolverlo en una lista """
+def leer():
+    # Abrimos el fichero
+    with open(DatosEntrada + extension, mode='r') as fichero_csv:
+        # Lo leemos
+        csv_reader = csv.reader(fichero_csv, delimiter=',')
+        # Quitamos las cabeceras
+        next(csv_reader)
+        array = []
+        for i, row in enumerate(csv_reader):
+            array.append([])
+            for j, value in enumerate(row):
+                if (j!=12):
+                    array[i].append(float(value))
+                else:
+                    array[i].append(value)
+        return array
+
 """ Main """
 def main():
     #Primero leemos los datos del fichero de entrada
     datos = lectura_DatosEntrada()
-    #Generamos unos datos sin las categorías
-    datos_sinCategoria = datos[1:]
+    cabeceras = datos[0]
+    datos_sinCategoria = leer()
     #Guardamos los maximos y minimos de cada columna
-    maximos, minimos = save_max_min (datos[0], datos_sinCategoria)
+    maximos, minimos = save_max_min(cabeceras, datos_sinCategoria)
 
     #Calculamos los datos normalizados
     datos_normalizados = []
     for num_fila, contenidoCompleto_fila in enumerate(datos_sinCategoria):
         datos_normalizados.append([])
-        for columna, valor in enumerate(contenidoCompleto_fila):
-            datoNormalizado = normalizacion(float(valor), minimos[columna], maximos[columna])
+        for columna, valor in enumerate(contenidoCompleto_fila[:-1]):
+            datoNormalizado = normalizacion(valor, minimos[columna], maximos[columna])
             datos_normalizados[num_fila].append(datoNormalizado)
+        datos_normalizados[num_fila].append(contenidoCompleto_fila[12])
 
     #Dividir en clases
     datos_nubes = []
     datos_cieloDespejado= []
     datos_multinube = []
-    for x in enumerate(datos_normalizados):
-        if(datos_normalizados[x][12] == "nube"):
+    
+    
+    for x in range(len(datos_normalizados)):
+        var = datos_normalizados[x][12]
+        if(var == "nube"):
             datos_nubes.append(datos_normalizados[x])
-        elif(datos_normalizados[x][12] == "cieloDespejado"):
+        elif(var == "cieloDespejado"):
             datos_cieloDespejado.append(datos_normalizados[x])
         else:
             datos_multinube.append(datos_normalizados[x])
 
 
-    """ 12 -->datos_cieloDespejado
+    """ CANTIDAD DE DATOS EN CADA FOLD
+        12 --> datos_cieloDespejado
         39 --> datos_multinube
-        129+128+128+128 --> datos_nube"""
+        129+128+128+128 --> datos_nube  """
+
     P1, P2, P3, P4 = [], [], [], []
-    for x in enumerate(datos_cieloDespejado):
-        if (x <= 12):
+    for x in range(len(datos_cieloDespejado)):
+        if (x < 12):
             P1.append(datos_cieloDespejado[x])
-        elif (x > 12 and x <= 24):
+        elif (x >= 12 and x < 24):
             P2.append(datos_cieloDespejado[x])
-        elif (x > 24 and x <= 36):
+        elif (x >= 24 and x < 36):
             P3.append(datos_cieloDespejado[x])
         else:
             P4.append(datos_cieloDespejado[x])
     
-    for x in enumerate(datos_multinube):
-        if (x <= 39):
+    for x in range(len(datos_multinube)):
+        if (x < 39):
             P1.append(datos_multinube[x])
-        elif (x > 39 and x <= 78):
+        elif (x >= 39 and x < 78):
             P2.append(datos_multinube[x])
-        elif (x > 78 and x <= 117):
+        elif (x >= 78 and x < 117):
             P3.append(datos_multinube[x])
         else:
             P4.append(datos_nubes[x])
 
-    for x in enumerate(datos_nubes):
-        if (x <= 129):
+    for x in range(len(datos_nubes)):
+        if (x < 129):
             P1.append(datos_nubes[x])
-        elif (x > 129 and x <= 257):
+        elif (x >= 129 and x < 257):
             P2.append(datos_nubes[x])
-        elif (x > 257 and x <= 385):
+        elif (x >= 257 and x < 385):
             P3.append(datos_nubes[x])
         else:
             P4.append(datos_nubes[x])
@@ -163,26 +189,26 @@ def main():
     # MODELO 1: P1 TEST + (P2+P3+P4) ENTRENAMIENTO
     Conjunto_entrenamiento = P2_aleatorizado + P3_aleatorizado + P4_aleatorizado
     Conjunto_entrenamiento_aleatorizar = aleatorizacion(Conjunto_entrenamiento)
-    generar_fichero('_entrenamiento', Conjunto_entrenamiento_aleatorizar, datos[0])
-    generar_fichero('_test', P1_aleatorizado, datos[0])
+    generar_fichero('_entrenamiento', 'Modelo_1/', Conjunto_entrenamiento_aleatorizar, cabeceras)
+    generar_fichero('_test','Modelo_1/', P1_aleatorizado, cabeceras)
 
     # MODELO 2: P2 TEST +(P1+P3+P4) ENTRENAMIENTO
     Conjunto_entrenamiento = P1_aleatorizado + P3_aleatorizado + P4_aleatorizado
     Conjunto_entrenamiento_aleatorizar = aleatorizacion(Conjunto_entrenamiento)
-    generar_fichero('_entrenamiento', Conjunto_entrenamiento_aleatorizar, datos[0])
-    generar_fichero('_test', P2_aleatorizado, datos[0])
+    generar_fichero('_entrenamiento','Modelo_2/', Conjunto_entrenamiento_aleatorizar, cabeceras)
+    generar_fichero('_test', 'Modelo_2/',P2_aleatorizado, cabeceras)
 
     # MODELO 3: P3 TEST +(P1+P2+P4) ENTRENAMIENTO
     Conjunto_entrenamiento = P1_aleatorizado + P2_aleatorizado + P4_aleatorizado
     Conjunto_entrenamiento_aleatorizar = aleatorizacion(Conjunto_entrenamiento)
-    generar_fichero('_entrenamiento', Conjunto_entrenamiento_aleatorizar, datos[0])
-    generar_fichero('_test', P3_aleatorizado, datos[0])
+    generar_fichero('_entrenamiento','Modelo_3/', Conjunto_entrenamiento_aleatorizar, cabeceras)
+    generar_fichero('_test', 'Modelo_3/',P3_aleatorizado, cabeceras)
 
     # MODELO 4: P4 TEST +(P1+P3+P2) ENTRENAMIENTO
     Conjunto_entrenamiento = P1_aleatorizado + P2_aleatorizado + P3_aleatorizado
     Conjunto_entrenamiento_aleatorizar = aleatorizacion(Conjunto_entrenamiento)
-    generar_fichero('_entrenamiento', Conjunto_entrenamiento_aleatorizar, datos[0])
-    generar_fichero('_test', P4_aleatorizado, datos[0])
+    generar_fichero('_entrenamiento','Modelo_4/', Conjunto_entrenamiento_aleatorizar, cabeceras)
+    generar_fichero('_test', 'Modelo_4/',P4_aleatorizado, cabeceras)
 
     
    
