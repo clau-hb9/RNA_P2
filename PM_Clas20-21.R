@@ -115,7 +115,7 @@ accuracies
 MSEtrain <-sum((trainTarget - trainPred)^2)/nrow(trainSet)
 MSEtest <-sum((testTarget - testPred)^2)/nrow(testSet)
 
-MSEtrain[2]
+MSEtrain
 MSEtest
 
 #GUARDANDO RESULTADOS
