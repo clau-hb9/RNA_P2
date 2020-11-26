@@ -27,8 +27,8 @@ fold <- 1
 #trainSet <- read.table(paste("Train",fold,".txt",sep=""),header = T)
 #testSet  <- read.table(paste("Test", fold,".txt",sep=""),header = T)
 
-trainSet <- read.csv(paste("Train",fold,".csv",sep=""),dec=".",sep=",",header = T)
-testSet  <- read.csv(paste("Test", fold,".csv",sep=""),dec=".",sep=",",header = T)
+trainSet <- read.csv(paste("DatosProcesados/Modelo_",fold,"/datosNubes_entrenamiento.txt",sep=""),dec=".",sep=",",header = T)
+testSet  <- read.csv(paste("DatosProcesados/Modelo_",fold,"/datosNubes_test.txt",sep=""),dec=".",sep=",",header = T)
 
 
 #SELECCION DE LA SALIDA. Num de columna del target. 
@@ -112,11 +112,11 @@ accuracies
 
 
 # calcular errores finales MSE
-#MSEtrain <-sum((trainTarget - trainPred)^2)/nrow(trainSet)
-#MSEtest <-sum((testTarget - testPred)^2)/nrow(testSet)
+MSEtrain <-sum((trainTarget - trainPred)^2)/nrow(trainSet)
+MSEtest <-sum((testTarget - testPred)^2)/nrow(testSet)
 
-
-
+MSEtrain[2]
+MSEtest
 
 #GUARDANDO RESULTADOS
 #MODELO
