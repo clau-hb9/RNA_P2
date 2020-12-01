@@ -167,7 +167,7 @@ def main():
         elif (x >= 78 and x < 117):
             P3.append(datos_multinube[x])
         else:
-            P4.append(datos_nubes[x])
+            P4.append(datos_multinube[x])
 
     for x in range(len(datos_nubes)):
         if (x < 129):
