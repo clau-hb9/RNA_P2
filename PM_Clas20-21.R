@@ -25,7 +25,7 @@ set.seed(3)
 #SELECCION DE LOS HIPERPARAMETROS DE LA RED
 topologia        <- c(10)
 razonAprendizaje <- 0.01
-ciclosMaximos    <- 1000
+ciclosMaximos    <- 2000
 
  # for(i in 1:4){
      train_model(seed,razonAprendizaje,1) 
@@ -115,8 +115,8 @@ train_model <-function(seed,aprendizaje,fold){
       
       
       #VECTOR DE PRECISIONES y errores finales MSE
-      results <- c(MSEtrain= sum((trainTarget - trainPred)^2)/nrow(trainSet),TrainAccuracy= accuracy(trainCm),trainCm= confusionMatrix(trainTarget,trainPred),MSEtest= sum((testTarget - testPred)^2)/nrow(testSet), TestAccuracy=  accuracy(testCm),testCm=confusionMatrix(testTarget, testPred))
-      results
+      #results <- c(MSEtrain= sum((trainTarget - trainPred)^2)/nrow(trainSet),TrainAccuracy= accuracy(trainCm),trainCm= confusionMatrix(trainTarget,trainPred),MSEtest= sum((testTarget - testPred)^2)/nrow(testSet), TestAccuracy=  accuracy(testCm),testCm=confusionMatrix(testTarget, testPred))
+      #results
       #write.xlsx(results, "resultados.xlsx", sheetName="Hoja1", col.names=TRUE, row.names=TRUE, append=FALSE)
       #tasa de aciertos (accuracy)
       #write.csv(results, paste("resultados_",i,".csv",sep = ""))
