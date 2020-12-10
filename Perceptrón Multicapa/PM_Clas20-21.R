@@ -13,16 +13,16 @@ graficaError <- function(iterativeErrors){
 accuracy <- function (cm) sum(diag(cm))/sum(cm)
 
 
-set.seed(5)
+set.seed(2)
 #SELECCION DE LOS HIPERPARAMETROS DE LA RED
-topologia        <- c(10)
-razonAprendizaje <- 0.01
-ciclosMaximos    <- 2000
+topologia        <- c(20,30)
+razonAprendizaje <- 0.02
+ciclosMaximos    <- 2500
 
 #CARGA DE LOS DATOS
 # cambiar a fold 2 y 3
 
-fold <- 4
+fold <- 1
 
 
 
